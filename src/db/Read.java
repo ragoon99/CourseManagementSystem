@@ -91,32 +91,31 @@ public class Read extends dbDetails {
 		return null;
     }
     
-    public int getID() {
+    public int getID(String tableName) {
     	try {
     		int id = 0;
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection(super.url + super.dbName, super.username, super.pswd);
             
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT id FROM student ORDER BY id DESC LIMIT 1");
+            ResultSet rs = stmt.executeQuery("SELECT id FROM " + tableName + " ORDER BY id DESC LIMIT 1");
             
             rs.next();
             
             id = rs.getInt(1);
             
+            System.out.println(id);
+            
             con.close();
             
             return id;
         } catch (ClassNotFoundException | SQLException e) {
-
             if(e instanceof ClassNotFoundException) {
                     System.out.println("Error While Loading Driver");
             } else {
-            	e.printStackTrace();
                 System.out.println("Error While Reading Table");
-            }
-            
+            }            
+            return 0;
         }
-		return 0;
     }
 }

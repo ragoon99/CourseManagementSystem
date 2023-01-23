@@ -38,6 +38,7 @@ public class PopUpMessage extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		setVisible(true);
 		setTitle("Info");
+		setAlwaysOnTop(true);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

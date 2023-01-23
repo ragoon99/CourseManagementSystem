@@ -38,16 +38,16 @@ public class Create extends dbDetails{
         }
     }
 
-    public void addStudent(int id, String firstName, String lastName, Date dob, String address, String gender, String moduleEnrolled, String email, String password) {	
+    public void addStudent(String id, String firstName, String lastName, Date dob, String address, String gender, String moduleEnrolled, String email, String password) {	
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + super.dbName, super.username, super.pswd);
 
             PreparedStatement st = con.prepareStatement("INSERT INTO student "
-                            + "(id, firstName, lastName, dob, address, gender, courseEnrolled) "
+                            + "(studentId, firstName, lastName, dob, address, gender, courseEnrolled) "
                             + "Values (?, ?, ?, ?, ?, ?, ?)");
 
-            st.setInt(1, id);
+            st.setString(1, id);
             st.setString(2, firstName);
             st.setString(3, lastName);
             st.setDate(4, dob);
@@ -59,7 +59,7 @@ public class Create extends dbDetails{
             
             PreparedStatement anotherSt = con.prepareStatement("INSERT INTO studentcreds (studentId, email, password) VALUES (?, ?, ?)");
             
-            anotherSt.setInt(1, id);
+            anotherSt.setString(1, id);
             anotherSt.setString(2, email);
             anotherSt.setString(3, password);
             
@@ -74,6 +74,43 @@ public class Create extends dbDetails{
             }
 
             System.out.println(e);
+        }
+    }
+    
+    public void addTutor(String id, String firstName, String lastName, Date dob, String address, String gender, String email, String password) {	
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + super.dbName, super.username, super.pswd);
+
+            PreparedStatement st = con.prepareStatement("INSERT INTO tutor "
+                            + "(id, fName, lName, dob, address, gender) "
+                            + "Values (?, ?, ?, ?, ?, ?)");
+
+            st.setString(1, id);
+            st.setString(2, firstName);
+            st.setString(3, lastName);
+            st.setDate(4, dob);
+            st.setString(5, address);
+            st.setString(6, gender);
+
+            st.executeUpdate();
+            
+            PreparedStatement anotherSt = con.prepareStatement("INSERT INTO tutorcreds (tutorId, email, password) VALUES (?, ?, ?)");
+            
+            anotherSt.setString(1, id);
+            anotherSt.setString(2, email);
+            anotherSt.setString(3, password);
+            
+            anotherSt.execute();
+
+            con.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            if(e instanceof ClassNotFoundException) {
+            	System.out.println("Error While Loading Driver");
+            } else if (e instanceof SQLIntegrityConstraintViolationException) {
+            	new ErrorGUI("Tutor is Already Regsitered.");
+            }
+            e.printStackTrace();
         }
     }
 

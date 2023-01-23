@@ -35,11 +35,12 @@ public class UserLogin extends dbDetails {
                 st.setInt(1, id);
                 st.setString(2, pass);
                 
-                if (st.execute()) {
+                rs = st.executeQuery();
+                
+                if (rs.next()) {
                 	con.close();
                 	return true;
                 }
-                
                 con.close();
                 return false;
             } 
@@ -62,22 +63,14 @@ public class UserLogin extends dbDetails {
 		}
     }
     
-    public boolean tutorLogin (int id, String pass) {
-    	return tutorLogin(id, null, pass);
-    }
-    
-    public boolean tutorLogin (String email, String pass) {
-    	return tutorLogin(0, email, pass);
-    }
-    
-    public boolean tutorLogin (int id, String email, String pass) {
+    public boolean tutorLogin (String id, String pass) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + super.dbName, super.username, super.pswd);
             
-            PreparedStatement st = con.prepareStatement("SELECT teacherId FROM tutorcreds WHERE teacherId=? OR email=?");
-            st.setInt(1, id);
-            st.setString(2, email);
+            PreparedStatement st = con.prepareStatement("SELECT id FROM tutorcreds WHERE id=? OR email=?");
+            st.setString(1, id);
+            st.setString(2, id);
             
             ResultSet rs = st.executeQuery();
             
@@ -88,16 +81,17 @@ public class UserLogin extends dbDetails {
             System.out.println(state);
             
             if (state) {
-                st = con.prepareStatement("SELECT password FROM tutorcreds WHERE (teacherID=? OR email=?) AND password=?");
-                st.setInt(1, id);
-                st.setString(2, email);
+                st = con.prepareStatement("SELECT password FROM tutorcreds WHERE (id=? OR email=?) AND password=?");
+                st.setString(1, id);
+                st.setString(2, id);
                 st.setString(3, pass);
                 
-                if (st.execute()) {
+                rs = st.executeQuery();
+                
+                if (rs.next()) {
                 	con.close();
                 	return true;
-                }
-                
+                } 
                 con.close();
                 return false;
             } 
@@ -120,35 +114,32 @@ public class UserLogin extends dbDetails {
 		}
     }
     
-    public boolean studentLogin (int id, String pass) {
-    	return studentLogin(id, null, pass);
-    }
-    
-    public boolean studentLogin (String email, String pass) {
-    	return studentLogin(0, email, pass);
-    }
-    
-    public boolean studentLogin (int id, String email, String pass) {
+    public boolean studentLogin (String id, String pass) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + super.dbName, super.username, super.pswd);
             
-            PreparedStatement st = con.prepareStatement("SELECT studentId FROM studentcreds WHERE studentId=? OR email=?");
-            st.setInt(1, id);
-            st.setString(2, email);
+            PreparedStatement st = con.prepareStatement("SELECT id FROM studentcreds WHERE id=? OR email=?");
+            st.setString(1, id);
+            st.setString(2, id);
             
             ResultSet rs = st.executeQuery();
             
             state = rs.next();
             
             if (state) {
-                st = con.prepareStatement("SELECT password FROM studentcreds WHERE (studentId=? OR email=?) AND password=?");
-                st.setInt(1, id);
-                st.setString(2, email);
+                st = con.prepareStatement("SELECT password FROM studentcreds WHERE (id=? OR email=?) AND password=?");
+                st.setString(1, id);
+                st.setString(2, id);
                 st.setString(3, pass);
                 
-                if (st.execute()) return true;
+                rs = st.executeQuery();
                 
+                if (rs.next()) {
+                	con.close();
+                	return true;
+                }
+                con.close();
                 return false;
             } 
             
