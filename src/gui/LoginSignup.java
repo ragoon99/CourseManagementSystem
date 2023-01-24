@@ -1,6 +1,5 @@
 package gui;
 
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,7 +8,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
 import java.awt.Font;
 import javax.swing.JTextField;
@@ -52,38 +50,34 @@ import javax.swing.border.LineBorder;
 
 import utils.*;
 
-public class Main extends JFrame {
+public class LoginSignup extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField email_field;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-					Main frame = new Main();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	private JPasswordField password_field;
+	private JTextField fname_field;
+	private JTextField address_field;
+	private JTextField pass_field;
+	private JTextField lname_field;
+	private JTextField cPass_field;
+	private JTextField city_field;
+	private JTextField usrId_field;
+	
+	private final int admin = 0;
+	private final int student = 1;
+	private final int tutor = 2;
+	public Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	
 	/**
 	 * Create the frame.
 	 */
-	public Main() {
+	public LoginSignup() {
+		setVisible(true);
 		setBackground(new Color(255, 255, 255));
 		setResizable(false);
 		setSize(new Dimension(500, 600));
 		setPreferredSize(new Dimension(500, 600));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		contentPane = new JPanel();
 		contentPane.setPreferredSize(new Dimension(500, 600));
@@ -138,7 +132,7 @@ public class Main extends JFrame {
 		gbc_userIcon.gridy = 2;
 		center_panel.add(userIcon, gbc_userIcon);
 		
-		JTextField usrId_field = new JTextField();
+		usrId_field = new JTextField();
 		usrId_field.setSize(new Dimension(100, 0));
 		usrId_field.setPreferredSize(new Dimension(100, 19));
 		GridBagConstraints gbc_usrId_field = new GridBagConstraints();
@@ -167,24 +161,24 @@ public class Main extends JFrame {
 		gbc_password_icon.gridy = 5;
 		center_panel.add(password_icon, gbc_password_icon);
 		
-		JPasswordField pass_field = new JPasswordField();
-		pass_field.addKeyListener(new KeyAdapter() {
+		password_field = new JPasswordField();
+		password_field.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if (pass_field.getPassword().length < 4) {
-					pass_field.setBorder(new LineBorder(Color.red));
+				if (password_field.getPassword().length < 4) {
+					password_field.setBorder(new LineBorder(Color.red));
 				} else {
-					pass_field.setBorder(new LineBorder(Color.gray, 1));
+					password_field.setBorder(new LineBorder(Color.gray, 1));
 				}
 			} 
 		});
-		pass_field.setEchoChar('*');
+		password_field.setEchoChar('*');
 		GridBagConstraints gbc_pass_field = new GridBagConstraints();
 		gbc_pass_field.fill = GridBagConstraints.HORIZONTAL;
 		gbc_pass_field.insets = new Insets(0, 0, 5, 5);
 		gbc_pass_field.gridx = 2;
 		gbc_pass_field.gridy = 5;
-		center_panel.add(pass_field, gbc_pass_field);
+		center_panel.add(password_field, gbc_pass_field);
 		
 		ImageIcon showPassImageIcon = new ImageIcon(getClass().getResource("/resource/eye.png"));
 		Image showPassImage = showPassImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_AREA_AVERAGING);
@@ -196,10 +190,10 @@ public class Main extends JFrame {
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					showPass.setIcon(new ImageIcon(showPassImage));
-					pass_field.setEchoChar((char) 0);
+					password_field.setEchoChar((char) 0);
 				} else {
 					showPass.setIcon(new ImageIcon(hidePassImage));
-					pass_field.setEchoChar('*');
+					password_field.setEchoChar('*');
 				}
 			}
 		});
@@ -253,14 +247,14 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					String uidString = usrId_field.getText();
-					String pass = String.valueOf(pass_field.getPassword());
+					String pass = String.valueOf(password_field.getPassword());
 					
 					if (usrSelect_combo.getSelectedItem() == "Student") {
 						boolean state = new UserLogin().studentLogin(uidString, pass);
 						
 						if (state) {
 							new PopUpMessage("Logged In Successfully!");
-							new HomePage();
+							new HomePage(student);
 							dispose();
 						}
 						else new ErrorGUI("ID and Password Does not match...");
@@ -271,18 +265,18 @@ public class Main extends JFrame {
 						
 						if (state) {
 							new PopUpMessage("Logged In Successfully!");
-							new HomePage();
+							new HomePage(tutor);
 							dispose();
 						}
 						else new ErrorGUI("ID and Password Does not match...");
 					}
 					
 					if (usrSelect_combo.getSelectedItem() == "Admin") {
-						boolean state = new UserLogin().adminLogin(Integer.parseInt(uidString), pass);
+						boolean state = new UserLogin().adminLogin(uidString, pass);
 						
 						if (state) {
 							new PopUpMessage("Logged In Successfully!");
-							new HomePage();
+							new HomePage(admin);
 							dispose();
 						}
 						else new ErrorGUI("ID and Password Does not match...");
@@ -340,12 +334,6 @@ public class Main extends JFrame {
 	
 	public void signupComponent() {
 		setTitle("Signup - Course Management System");
-		JTextField fname_field;
-		JTextField address_field;
-		JTextField pass_field;
-		JTextField lname_field;
-		JTextField cPass_field;
-		JTextField city_field;
 		
 		JPanel topPanel = new JPanel();
 		topPanel.setBackground(new Color(255, 255, 255));

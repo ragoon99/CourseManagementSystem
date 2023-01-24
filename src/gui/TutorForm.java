@@ -1,7 +1,5 @@
 package gui;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -21,7 +19,6 @@ import utils.JTextFieldLimit;
 import java.awt.BorderLayout;
 import java.awt.Color;
 
-import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.Font;
@@ -43,9 +40,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.font.TextAttribute;
 import java.sql.Date;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.JTextField;

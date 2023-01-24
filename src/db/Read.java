@@ -8,65 +8,19 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.table.DefaultTableModel;
 
 public class Read extends dbDetails {
-    public ResultSet readTable(String tableName) {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(super.url + super.dbName, super.username, super.pswd);
-
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM " + tableName);
-            ResultSet rs = ps.executeQuery();
-
-            con.close();
-            
-            return rs;
-        } catch (ClassNotFoundException | SQLException e) {
-
-            if(e instanceof ClassNotFoundException) {
-                System.out.println("Error While Loading Driver");
-            } else {
-                System.out.println("Error While Reading Table");
-            }
-            
-            return null;
-        }
-    }
-  
-    void getTable (String tablename) {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(super.url + super.dbName, super.username, super.pswd);
-            
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM " + tablename);
-            
-            ResultSetMetaData rsmd = rs.getMetaData();
-            
-            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                
-                System.out.println(rsmd.getColumnName(i));
-                
-            }
-            
-            con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-
-            if(e instanceof ClassNotFoundException) {
-                    System.out.println("Error While Loading Driver");
-            } else {
-                    System.out.println("Error While Reading Table");
-            }
-            
-        }
-        
-    }
-    
     public Object[] getCourses() {
     	try {
     		ArrayList<String> course= new ArrayList<>();
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(super.url + super.dbName, super.username, super.pswd);
+            Connection con = getConnection();
             
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT courseCode FROM courses");
@@ -78,24 +32,18 @@ public class Read extends dbDetails {
             con.close();
             
             return course.toArray();
-        } catch (ClassNotFoundException | SQLException e) {
-
-            if(e instanceof ClassNotFoundException) {
-                    System.out.println("Error While Loading Driver");
-            } else {
-            	e.printStackTrace();
-                System.out.println("Error While Reading Table");
-            }
+        } catch (SQLException e) {
+        	e.printStackTrace();
+            System.out.println("Error While Reading Table");
             
+            return null;
         }
-		return null;
     }
     
     public int getID(String tableName) {
     	try {
     		int id = 0;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(super.url + super.dbName, super.username, super.pswd);
+            Connection con = getConnection();
             
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT id FROM " + tableName + " ORDER BY id DESC LIMIT 1");
@@ -109,13 +57,52 @@ public class Read extends dbDetails {
             con.close();
             
             return id;
-        } catch (ClassNotFoundException | SQLException e) {
-            if(e instanceof ClassNotFoundException) {
-                    System.out.println("Error While Loading Driver");
-            } else {
-                System.out.println("Error While Reading Table");
-            }            
+        } catch (SQLException e) {
+            System.out.println("Error While Reading Table");
+            
             return 0;
         }
+    }
+    
+    public DefaultTableModel getTableModel(String table) {
+    	Connection con = getConnection();
+    	
+    	DefaultTableModel tableModel = new DefaultTableModel() {
+    		@Override
+    		public boolean isCellEditable(int row, int column) {
+    		       //all cells false
+    		       return false;
+    		}
+    	};
+    	
+    	int columnLength;
+    	
+		try {
+			ResultSet st = con.createStatement().executeQuery("SELECT * FROM " + table);
+			ResultSetMetaData rsmd = st.getMetaData();
+			
+			columnLength = rsmd.getColumnCount();
+			String columnNames[] = new String[columnLength];
+			
+			for (int i = 0; i < columnLength; i++) {
+				columnNames[i] =  rsmd.getColumnName(i+1);
+			}
+			
+	    	tableModel.setColumnIdentifiers(columnNames);
+			
+			while(st.next()) {
+				ArrayList<Object> data = new ArrayList<>(); 
+				for (String string : columnNames) {
+					data.add(st.getObject(string));
+				}
+				
+				tableModel.addRow(data.toArray());
+			}
+			
+			return tableModel;
+		} catch (SQLException e) {
+			System.out.println("Error While Reading Table");
+			return null;
+		}
     }
 }

@@ -8,8 +8,7 @@ import java.sql.SQLException;
 public class Delete extends dbDetails {
 	void deleteTable (String tName) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(super.url + super.dbName, super.username, super.pswd);
+            Connection con = getConnection();
 
             PreparedStatement ps = con.prepareStatement("DROP TABLE " + tName);
             ps.execute();
@@ -18,20 +17,14 @@ public class Delete extends dbDetails {
 
             System.out.println("Table Deleted Successfully.");
 
-        } catch (ClassNotFoundException | SQLException e) {
-
-            if(e instanceof ClassNotFoundException) {
-                    System.out.println("Error While Loading Driver");
-            } else {
-                    System.out.println("Error While Deleting Table");
-            }
+        } catch (SQLException e) {
+            System.out.println("Error While Deleting Table");
         }
     }
 
     void deleteCourse(String id) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(super.url + super.dbName, super.username, super.pswd);
+            Connection con = getConnection();
 
             PreparedStatement ps = con.prepareStatement("DELETE FROM courses WHERE courseCode=?");
             ps.setString(1, id);
@@ -41,14 +34,9 @@ public class Delete extends dbDetails {
             con.close();
 
             System.out.println("Entry Deleted.");
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             System.out.println(e);
-
-            if(e instanceof ClassNotFoundException) {
-                    System.out.println("Error While Loading Driver");
-            } else {
-                    System.out.println("Error While Deleting Entry");
-            }
+            System.out.println("Error While Deleting Entry");
         }
     }
     

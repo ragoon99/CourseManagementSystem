@@ -12,8 +12,7 @@ import exception.ErrorGUI;
 public class Create extends dbDetails{
 	void createCourse(String courseCode, String cName, int totalSemester, int semLength) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + super.dbName, super.username, super.pswd);
+            Connection con = getConnection();
 
             PreparedStatement st = con.prepareStatement("INSERT INTO courses "
                             + "(courseCode, courseName, totalSemester, semesterDuration) "
@@ -29,10 +28,8 @@ public class Create extends dbDetails{
             System.out.println("Course Added.");
 
             con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            if(e instanceof ClassNotFoundException) {
-                    System.out.println("Error While Loading Driver");
-            } else if (e instanceof SQLIntegrityConstraintViolationException) {
+        } catch (SQLException e) {
+        	if (e instanceof SQLIntegrityConstraintViolationException) {
                     System.out.println("Module is Already Regsitered in Database.");
             }
         }
@@ -40,8 +37,7 @@ public class Create extends dbDetails{
 
     public void addStudent(String id, String firstName, String lastName, Date dob, String address, String gender, String moduleEnrolled, String email, String password) {	
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + super.dbName, super.username, super.pswd);
+            Connection con = getConnection();
 
             PreparedStatement st = con.prepareStatement("INSERT INTO student "
                             + "(studentId, firstName, lastName, dob, address, gender, courseEnrolled) "
@@ -66,10 +62,8 @@ public class Create extends dbDetails{
             anotherSt.execute();
 
             con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            if(e instanceof ClassNotFoundException) {
-            	System.out.println("Error While Loading Driver");
-            } else if (e instanceof SQLIntegrityConstraintViolationException) {
+        } catch (SQLException e) {
+            if (e instanceof SQLIntegrityConstraintViolationException) {
             	new ErrorGUI("Student is Already Regsitered.");
             }
 
@@ -79,8 +73,7 @@ public class Create extends dbDetails{
     
     public void addTutor(String id, String firstName, String lastName, Date dob, String address, String gender, String email, String password) {	
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + super.dbName, super.username, super.pswd);
+            Connection con = getConnection();
 
             PreparedStatement st = con.prepareStatement("INSERT INTO tutor "
                             + "(id, fName, lName, dob, address, gender) "
@@ -104,10 +97,8 @@ public class Create extends dbDetails{
             anotherSt.execute();
 
             con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            if(e instanceof ClassNotFoundException) {
-            	System.out.println("Error While Loading Driver");
-            } else if (e instanceof SQLIntegrityConstraintViolationException) {
+        } catch (SQLException e) {
+            if (e instanceof SQLIntegrityConstraintViolationException) {
             	new ErrorGUI("Tutor is Already Regsitered.");
             }
             e.printStackTrace();
