@@ -7,40 +7,40 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import utils.LoadImage;
-
-public class PopUpMessage extends JDialog {
+public class InfoGUI extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	
-	public PopUpMessage(String msg) {
+	public InfoGUI(String msg) {
 		this(msg, null, null);
 	}
 	
-	public PopUpMessage(String msg, String msg2) {
+	public InfoGUI(String msg, String msg2) {
 		this(msg, msg2, null);
 	}
 	
-	public PopUpMessage(String msg, String msg2, String msg3) {
-		setIconImage(new LoadImage("/resource/yes.png", 38, 38).getImage());
+	/**
+	 * @wbp.parser.constructor
+	 */
+	public InfoGUI(String msg, String msg2, String msg3) {
+		setIconImage(new ImageIcon(getClass().getResource("/resource/correct.png")).getImage());
 		setResizable(false);
-		setBounds(100, 100, 370, 220);
+		setBounds(100, 100, 403, 194);
 		getContentPane().setLayout(new BorderLayout());
 		setTitle("Info");
 		setAlwaysOnTop(true);
 		setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+		setLocationRelativeTo(null);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		GridBagLayout gbl_contentPanel = new GridBagLayout();
@@ -96,10 +96,6 @@ public class PopUpMessage extends JDialog {
 		}
 
 		setVisible(true);
-	}
-	
-	public static void main(String[] args) {
-		new PopUpMessage(null);
 	}
 
 }

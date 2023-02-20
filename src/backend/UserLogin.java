@@ -1,78 +1,67 @@
 package backend;
 
-import db.dbDetails;
-import exception.ErrorGUI;
-
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 import com.mysql.cj.jdbc.exceptions.CommunicationsException;
 
+import backend.Details.LoginDetails;
+import database.DBConnector;
+import exception.ErrorGUI;
+
 /**
+ * This class contains methods for Loggin Users in to the System
+ *
  *
  * @author Ragoon
  */
-public class UserLogin extends dbDetails {
-	private final String t1 = "admin";
-	private final String t2 = "tutorcreds";
-	private final String t3 = "studentcreds";
-	private boolean state = false;
+public class UserLogin extends DBConnector {
 	
-	public boolean adminLogin(String id, String pass) {
-		return this.userLogin(id, pass, t1);
-	}
-	
-	public boolean tutorLogin(String id, String pass) {
-		return this.userLogin(id, pass, t2);
-	}
-	
-	public boolean studentLogin(String id, String pass) {
-		return this.userLogin(id, pass, t3);
-	}
-    
-    private boolean userLogin (String id, String pass, String tableName) {
-        try {
+	/**
+	 * This method is used to login in user
+	 * 
+	 * @param LoginDetails which contains the credentials to try loggin from
+	 * 
+	 * @return true if credentials match the database
+	 * 			false if credentials does not match
+	 * 
+	 */
+	public boolean userLogin(LoginDetails details) {
+		try {
             Connection con = getConnection();
             
-            PreparedStatement st = con.prepareStatement("SELECT id FROM "+ tableName + " WHERE id=?");
-            st.setString(1, id);
+            PreparedStatement st = con.prepareStatement("SELECT id FROM " + details.getTableName() + " WHERE id=? AND password=?");
+            st.setInt(1, details.getUid());
+            st.setString(2, details.getPassword());
             
             ResultSet rs = st.executeQuery();
             
-            state = rs.next();
+            boolean state = rs.next();
             
             if (state) {
-                st = con.prepareStatement("SELECT password FROM "+ tableName + " WHERE id=? AND password=?");
-                st.setString(1, id);
-                st.setString(2, pass);
-                
-                rs = st.executeQuery();
-                
-                if (rs.next()) {
-                	con.close();
-                	return true;
-                }
+            	if (details.getTableName().equals(details.getStudentTable())) st = con.prepareStatement("INSERT INTO login_activity (userID, type) VALUES (?, 'Student')");
+            	if (details.getTableName().equals(details.getTutorTable())) st = con.prepareStatement("INSERT INTO login_activity (userID, type) VALUES (?, 'Tutor')");
+            	if (details.getTableName().equals(details.getAdminTable())) st = con.prepareStatement("INSERT INTO login_activity (userID, type) VALUES (?, 'Admin')");
+            	
+            	st.setInt(1, details.getUid());
+            	
+            	st.execute();
+            	
                 con.close();
-                return false;
+                
+                return true;
             } 
             
             con.close();
             
             return false;
 		} catch (Exception e) {
-            if (e instanceof SQLIntegrityConstraintViolationException) {
-            	System.out.println("Module is Already Regsitered in Database.");
-            } else if (e instanceof CommunicationsException) {
+            if (e instanceof CommunicationsException) {
             	new ErrorGUI("Error While Connecting to the Server").setVisible(true);
-            } else {
-            	e.printStackTrace();
             }
             
             return false;
 		}
-    }
-    
+	}
 }

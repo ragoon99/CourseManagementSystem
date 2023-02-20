@@ -1,25 +1,26 @@
 package exception;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Dialog;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.border.EmptyBorder;
 import java.awt.Toolkit;
-
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.awt.event.ActionEvent;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import utils.LoadImage;
 
 public class ErrorGUI extends JDialog {
 
@@ -33,6 +34,7 @@ public class ErrorGUI extends JDialog {
 	 * Create the dialog.
 	 */
 	public ErrorGUI(String msg, Exception error) {
+		setIconImage(new LoadImage("/resource/remove-icon.png", 16, 16).getImage());
 		setTitle("Error");
 		setResizable(false);
 		setBounds(100, 100, 450, 300);
@@ -46,8 +48,8 @@ public class ErrorGUI extends JDialog {
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{
 			JLabel message = new JLabel(msg);
-			message.setFont(new Font(Font.MONOSPACED, Font.BOLD, 10));
-			message.setPreferredSize(new Dimension(0, 30));
+			message.setFont(new Font(Font.MONOSPACED, Font.BOLD, 12));
+			message.setPreferredSize(new Dimension(0, 50));
 			message.setHorizontalTextPosition(SwingConstants.CENTER);
 			message.setHorizontalAlignment(SwingConstants.CENTER);
 			contentPanel.add(message, BorderLayout.NORTH);
@@ -61,6 +63,7 @@ public class ErrorGUI extends JDialog {
 					error.printStackTrace(new PrintWriter(sw));
 		            String exceptionAsString = sw.toString();
 					JTextArea textArea = new JTextArea(exceptionAsString);
+					textArea.setEditable(false);
 					textArea.setWrapStyleWord(true);
 					textArea.setLineWrap(true);
 					textArea.setFont(new Font("Monospaced", Font.PLAIN, 9));

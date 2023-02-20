@@ -1,8 +1,4 @@
-/backend/
-/db/
-/exception/
 /gui/
-/resource/
 /utils/
-/Main.class
-/Main$1.class
+/backend/
+/database/

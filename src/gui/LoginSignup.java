@@ -1,56 +1,56 @@
 package gui;
 
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-
 import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JButton;
-import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-
-import java.awt.Color;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-
-import org.jdatepicker.DateModel;
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
-
-import backend.UserLogin;
-import db.Create;
-import db.Read;
-import exception.ErrorGUI;
-
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import utils.*;
+import com.toedter.calendar.JDateChooser;
 
-public class LoginSignup extends JFrame {
+import backend.Courses;
+import backend.Students;
+import backend.UserLogin;
+import backend.Validation;
+import backend.Details.LoginDetails;
+import backend.Details.StudentDetails;
+import exception.ErrorGUI;
+import gui.Admin.AdminHomepage;
+import gui.Student.StudentHomepage;
+import gui.Tutor.TutorHomepage;
+import utils.CustomFrame;
+import utils.JTextFieldLimit;
+import utils.LoadImage;
+
+public class LoginSignup extends CustomFrame {
 
 	private JPanel contentPane;
 	private JTextField email_field;
@@ -63,35 +63,35 @@ public class LoginSignup extends JFrame {
 	private JTextField city_field;
 	private JTextField usrId_field;
 	
-	private final int admin = 0;
-	private final int student = 1;
-	private final int tutor = 2;
-	public Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	private Validation validator = new Validation();
+	private LoginDetails details = new LoginDetails();
 	
 	/**
 	 * Create the frame.
 	 */
 	public LoginSignup() {
-		setVisible(true);
 		setBackground(new Color(255, 255, 255));
 		setResizable(false);
 		setSize(new Dimension(500, 600));
+		setLocationRelativeTo(null);
 		setPreferredSize(new Dimension(500, 600));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		contentPane = new JPanel();
+		getContentPane().add(contentPane, BorderLayout.CENTER);
+		
 		contentPane.setPreferredSize(new Dimension(500, 600));
 		contentPane.setSize(new Dimension(500, 600));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		
-		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		loginComponent();
+		
+		setVisible(true);
 	}
 	
 	public void loginComponent() {
 		setTitle("Login - Course Management System");
+		
 		JPanel top_panel = new JPanel();
 		top_panel.setBackground(new Color(255, 255, 255));
 		contentPane.add(top_panel, BorderLayout.NORTH);
@@ -109,7 +109,7 @@ public class LoginSignup extends JFrame {
 		contentPane.add(center_panel, BorderLayout.CENTER);
 		GridBagLayout gbl_center_panel = new GridBagLayout();
 		gbl_center_panel.columnWidths = new int[]{135, 43, 145, 36, 109, 0, 0};
-		gbl_center_panel.rowHeights = new int[]{62, 19, 36, 42, 19, 36, 41, 21, 0, 0};
+		gbl_center_panel.rowHeights = new int[]{62, 19, 30, 42, 19, 30, 41, 21, 30, 0};
 		gbl_center_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_center_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		center_panel.setLayout(gbl_center_panel);
@@ -122,19 +122,14 @@ public class LoginSignup extends JFrame {
 		gbc_usrId_label.gridy = 1;
 		center_panel.add(usrId_label, gbc_usrId_label);
 		
-		ImageIcon userImageIcon = new ImageIcon(getClass().getResource("/resource/profile-user.png"));
-		Image userImage = userImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_AREA_AVERAGING);
-		JLabel userIcon = new JLabel(new ImageIcon(userImage));
+		JLabel userIcon = new JLabel(new LoadImage("/resource/user-icon.png"));
 		GridBagConstraints gbc_userIcon = new GridBagConstraints();
 		gbc_userIcon.insets = new Insets(0, 0, 5, 5);
-		gbc_userIcon.anchor = GridBagConstraints.NORTH;
 		gbc_userIcon.gridx = 1;
 		gbc_userIcon.gridy = 2;
 		center_panel.add(userIcon, gbc_userIcon);
 		
 		usrId_field = new JTextField();
-		usrId_field.setSize(new Dimension(100, 0));
-		usrId_field.setPreferredSize(new Dimension(100, 19));
 		GridBagConstraints gbc_usrId_field = new GridBagConstraints();
 		gbc_usrId_field.fill = GridBagConstraints.HORIZONTAL;
 		gbc_usrId_field.insets = new Insets(0, 0, 5, 5);
@@ -151,12 +146,9 @@ public class LoginSignup extends JFrame {
 		gbc_pass_label.gridy = 4;
 		center_panel.add(pass_label, gbc_pass_label);
 		
-		ImageIcon passImageIcon = new ImageIcon(getClass().getResource("/resource/padlock.png"));
-		Image passImage = passImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_AREA_AVERAGING);
-		JLabel password_icon = new JLabel(new ImageIcon(passImage));
+		JLabel password_icon = new JLabel(new LoadImage("/resource/password-icon.png"));
 		GridBagConstraints gbc_password_icon = new GridBagConstraints();
 		gbc_password_icon.insets = new Insets(0, 0, 5, 5);
-		gbc_password_icon.anchor = GridBagConstraints.NORTH;
 		gbc_password_icon.gridx = 1;
 		gbc_password_icon.gridy = 5;
 		center_panel.add(password_icon, gbc_password_icon);
@@ -180,19 +172,15 @@ public class LoginSignup extends JFrame {
 		gbc_pass_field.gridy = 5;
 		center_panel.add(password_field, gbc_pass_field);
 		
-		ImageIcon showPassImageIcon = new ImageIcon(getClass().getResource("/resource/eye.png"));
-		Image showPassImage = showPassImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_AREA_AVERAGING);
-		ImageIcon hidePassImageIcon = new ImageIcon(getClass().getResource("/resource/hidden.png"));
-		Image hidePassImage = hidePassImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_AREA_AVERAGING);
-		JCheckBox showPass = new JCheckBox(new ImageIcon(hidePassImage));
+		JCheckBox showPass = new JCheckBox(new LoadImage("/resource/hidePass-icon.png"));
 		showPass.setToolTipText("Show Password");
 		showPass.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					showPass.setIcon(new ImageIcon(showPassImage));
+					showPass.setIcon(new LoadImage("/resource/showPass-icon.png"));
 					password_field.setEchoChar((char) 0);
 				} else {
-					showPass.setIcon(new ImageIcon(hidePassImage));
+					showPass.setIcon(new LoadImage("/resource/hidePass-icon.png"));
 					password_field.setEchoChar('*');
 				}
 			}
@@ -212,9 +200,7 @@ public class LoginSignup extends JFrame {
 		gbc_usrSelect_label.gridy = 7;
 		center_panel.add(usrSelect_label, gbc_usrSelect_label);
 		
-		ImageIcon userTypeImageIcon = new ImageIcon(getClass().getResource("/resource/customer.png"));
-		Image userTypeImage = userTypeImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_AREA_AVERAGING);
-		JLabel userType_icon = new JLabel(new ImageIcon(userTypeImage));
+		JLabel userType_icon = new JLabel(new LoadImage("/resource/userSelect-icon.png"));
 		GridBagConstraints gbc_userType_icon = new GridBagConstraints();
 		gbc_userType_icon.insets = new Insets(0, 0, 0, 5);
 		gbc_userType_icon.anchor = GridBagConstraints.NORTH;
@@ -226,57 +212,62 @@ public class LoginSignup extends JFrame {
 		usrSelect_combo.setToolTipText("Select Type of the User");
 		usrSelect_combo.setModel(new DefaultComboBoxModel<String>(new String[] {"Student", "Tutor", "Admin"}));
 		GridBagConstraints gbc_usrSelect_combo = new GridBagConstraints();
-		gbc_usrSelect_combo.fill = GridBagConstraints.HORIZONTAL;
+		gbc_usrSelect_combo.fill = GridBagConstraints.BOTH;
 		gbc_usrSelect_combo.insets = new Insets(0, 0, 0, 5);
 		gbc_usrSelect_combo.gridx = 2;
 		gbc_usrSelect_combo.gridy = 8;
 		center_panel.add(usrSelect_combo, gbc_usrSelect_combo);
 		
 		JPanel bottom_panel = new JPanel();
+		bottom_panel.setPreferredSize(new Dimension(10, 100));
 		bottom_panel.setBackground(new Color(255, 255, 255));
 		contentPane.add(bottom_panel, BorderLayout.SOUTH);
 		GridBagLayout gbl_bottom_panel = new GridBagLayout();
-		gbl_bottom_panel.columnWidths = new int[]{145, 266, 139, 0};
-		gbl_bottom_panel.rowHeights = new int[]{21, 21, 0, 0, 0};
-		gbl_bottom_panel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_bottom_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_bottom_panel.columnWidths = new int[]{266, 0};
+		gbl_bottom_panel.rowHeights = new int[]{21, 30, 0};
+		gbl_bottom_panel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_bottom_panel.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
 		bottom_panel.setLayout(gbl_bottom_panel);
 		
 		JButton login_button = new JButton("Login");
 		login_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					String uidString = usrId_field.getText();
-					String pass = String.valueOf(password_field.getPassword());
+					details.setUid(Integer.parseInt(usrId_field.getText()));
+					details.setPassword(String.valueOf(password_field.getPassword()));
 					
 					if (usrSelect_combo.getSelectedItem() == "Student") {
-						boolean state = new UserLogin().studentLogin(uidString, pass);
+						details.setTableName(details.getStudentTable());
+						boolean state = new UserLogin().userLogin(details);
 						
 						if (state) {
 							new PopUpMessage("Logged In Successfully!");
-							new HomePage(student);
+							new StudentHomepage(details.getUid());
 							dispose();
 						}
 						else new ErrorGUI("ID and Password Does not match...");
 					}
 					
 					if (usrSelect_combo.getSelectedItem() == "Tutor") {
-						boolean state = new UserLogin().tutorLogin(uidString, pass);
+						details.setTableName(details.getTutorTable());
+						boolean state = new UserLogin().userLogin(details);
 						
 						if (state) {
 							new PopUpMessage("Logged In Successfully!");
-							new HomePage(tutor);
+							new TutorHomepage(details.getUid());
 							dispose();
 						}
 						else new ErrorGUI("ID and Password Does not match...");
 					}
 					
 					if (usrSelect_combo.getSelectedItem() == "Admin") {
-						boolean state = new UserLogin().adminLogin(uidString, pass);
+						details.setTableName(details.getAdminTable());
+						boolean state = new UserLogin().userLogin(details);
 						
 						if (state) {
 							new PopUpMessage("Logged In Successfully!");
-							new HomePage(admin);
+							new AdminHomepage(details.getUid());
+							
 							dispose();
 						}
 						else new ErrorGUI("ID and Password Does not match...");
@@ -292,8 +283,8 @@ public class LoginSignup extends JFrame {
 		});
 		GridBagConstraints gbc_login_button = new GridBagConstraints();
 		gbc_login_button.anchor = GridBagConstraints.NORTH;
-		gbc_login_button.insets = new Insets(0, 0, 5, 5);
-		gbc_login_button.gridx = 1;
+		gbc_login_button.insets = new Insets(0, 0, 5, 0);
+		gbc_login_button.gridx = 0;
 		gbc_login_button.gridy = 0;
 		bottom_panel.add(login_button, gbc_login_button);
 		
@@ -325,10 +316,9 @@ public class LoginSignup extends JFrame {
 		});
 		
 		GridBagConstraints gbc_register_button = new GridBagConstraints();
-		gbc_register_button.insets = new Insets(0, 0, 5, 5);
 		gbc_register_button.anchor = GridBagConstraints.NORTH;
-		gbc_register_button.gridx = 1;
-		gbc_register_button.gridy = 2;
+		gbc_register_button.gridx = 0;
+		gbc_register_button.gridy = 1;
 		bottom_panel.add(register_button, gbc_register_button);
 	}
 	
@@ -354,10 +344,10 @@ public class LoginSignup extends JFrame {
 		bottomPanel.setSize(new Dimension(0, 100));
 		contentPane.add(bottomPanel, BorderLayout.SOUTH);
 		GridBagLayout gbl_bottomPanel = new GridBagLayout();
-		gbl_bottomPanel.columnWidths = new int[]{146, 85, 85, 0};
-		gbl_bottomPanel.rowHeights = new int[]{36, 36, 0, 0};
-		gbl_bottomPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_bottomPanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_bottomPanel.columnWidths = new int[]{85, 0};
+		gbl_bottomPanel.rowHeights = new int[]{36, 0, 0};
+		gbl_bottomPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_bottomPanel.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
 		bottomPanel.setLayout(gbl_bottomPanel);
 		
 		JButton login_button = new JButton("Already Have An Account? Press Here");
@@ -372,27 +362,36 @@ public class LoginSignup extends JFrame {
 				contentPane.updateUI();
 			}
 		});
+		
+		JButton register_button = new JButton("Register");
+		GridBagConstraints gbc_register_button = new GridBagConstraints();
+		gbc_register_button.anchor = GridBagConstraints.NORTH;
+		gbc_register_button.insets = new Insets(0, 0, 5, 0);
+		gbc_register_button.gridx = 0;
+		gbc_register_button.gridy = 0;
+		bottomPanel.add(register_button, gbc_register_button);
+		
+		register_button.setEnabled(false);
+		
+		
 		login_button.setBackground(null);
 		login_button.setBorderPainted(false);
 		GridBagConstraints gbc_login_button = new GridBagConstraints();
-		gbc_login_button.insets = new Insets(0, 0, 0, 5);
 		gbc_login_button.anchor = GridBagConstraints.NORTH;
-		gbc_login_button.gridx = 1;
-		gbc_login_button.gridy = 2;
+		gbc_login_button.gridx = 0;
+		gbc_login_button.gridy = 1;
 		bottomPanel.add(login_button, gbc_login_button);
 		
 		JPanel centerPanel = new JPanel();
 		centerPanel.setBackground(new Color(255, 255, 255));
 		contentPane.add(centerPanel, BorderLayout.CENTER);
 		GridBagLayout gbl_centerPanel = new GridBagLayout();
-		gbl_centerPanel.columnWidths = new int[]{45, 67, 21, 60, 33, 34, 0, 66, 37, 0};
-		gbl_centerPanel.rowHeights = new int[]{35, 25, 31, 25, 27, 25, 28, 0, 24, 0, 0};
-		gbl_centerPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_centerPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_centerPanel.columnWidths = new int[]{30, 30, 120, 33, 34, 120, 30, 0};
+		gbl_centerPanel.rowHeights = new int[]{35, 25, 31, 25, 27, 25, 28, 0, 24, 0, 20, 0, 0};
+		gbl_centerPanel.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_centerPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		centerPanel.setLayout(gbl_centerPanel);
 		
-		ImageIcon fnameImageIcon = new ImageIcon(getClass().getResource("/resource/id-card.png"));
-		Image fnameImage = fnameImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
 		JLabel fname_label = new JLabel("First Name :");
 		fname_label.setFont(new Font("Tahoma", Font.PLAIN, 8));
 		GridBagConstraints gbc_fname_label = new GridBagConstraints();
@@ -407,10 +406,11 @@ public class LoginSignup extends JFrame {
 		GridBagConstraints gbc_lname_label = new GridBagConstraints();
 		gbc_lname_label.anchor = GridBagConstraints.WEST;
 		gbc_lname_label.insets = new Insets(0, 0, 5, 5);
-		gbc_lname_label.gridx = 6;
+		gbc_lname_label.gridx = 5;
 		gbc_lname_label.gridy = 0;
 		centerPanel.add(lname_label, gbc_lname_label);
-		JLabel fname_icon = new JLabel(new ImageIcon(fnameImage));
+		
+		JLabel fname_icon = new JLabel(new LoadImage("/resource/name-icon.png") );
 		GridBagConstraints gbc_fname_icon = new GridBagConstraints();
 		gbc_fname_icon.anchor = GridBagConstraints.NORTH;
 		gbc_fname_icon.insets = new Insets(0, 0, 5, 5);
@@ -425,7 +425,6 @@ public class LoginSignup extends JFrame {
 		fname_field.setSize(new Dimension(0, 20));
 		fname_field.setBorder(new LineBorder(new Color(192, 192, 192)));
 		GridBagConstraints gbc_fname_field = new GridBagConstraints();
-		gbc_fname_field.gridwidth = 2;
 		gbc_fname_field.fill = GridBagConstraints.BOTH;
 		gbc_fname_field.insets = new Insets(0, 0, 5, 5);
 		gbc_fname_field.gridx = 2;
@@ -440,10 +439,9 @@ public class LoginSignup extends JFrame {
 		lname_field.setSize(new Dimension(0, 20));
 		lname_field.setBorder(new LineBorder(new Color(192, 192, 192)));
 		GridBagConstraints gbc_lname_field = new GridBagConstraints();
-		gbc_lname_field.gridwidth = 2;
 		gbc_lname_field.insets = new Insets(0, 0, 5, 5);
 		gbc_lname_field.fill = GridBagConstraints.BOTH;
-		gbc_lname_field.gridx = 6;
+		gbc_lname_field.gridx = 5;
 		gbc_lname_field.gridy = 1;
 		centerPanel.add(lname_field, gbc_lname_field);
 		lname_field.setColumns(10);
@@ -462,13 +460,11 @@ public class LoginSignup extends JFrame {
 		GridBagConstraints gbc_city_label = new GridBagConstraints();
 		gbc_city_label.anchor = GridBagConstraints.WEST;
 		gbc_city_label.insets = new Insets(0, 0, 5, 5);
-		gbc_city_label.gridx = 6;
+		gbc_city_label.gridx = 5;
 		gbc_city_label.gridy = 2;
 		centerPanel.add(city_label, gbc_city_label);
 		
-		ImageIcon addressImageIcon = new ImageIcon(getClass().getResource("/resource/city.png"));
-		Image addressImage = addressImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-		JLabel address_icon = new JLabel(new ImageIcon(addressImage));
+		JLabel address_icon = new JLabel(new LoadImage("/resource/address-icon.png"));
 		GridBagConstraints gbc_address_icon = new GridBagConstraints();
 		gbc_address_icon.anchor = GridBagConstraints.NORTH;
 		gbc_address_icon.insets = new Insets(0, 0, 5, 5);
@@ -482,7 +478,6 @@ public class LoginSignup extends JFrame {
 		address_field.setSize(new Dimension(0, 20));
 		address_field.setBorder(new LineBorder(new Color(192, 192, 192)));
 		GridBagConstraints gbc_address_field = new GridBagConstraints();
-		gbc_address_field.gridwidth = 2;
 		gbc_address_field.fill = GridBagConstraints.BOTH;
 		gbc_address_field.insets = new Insets(0, 0, 5, 5);
 		gbc_address_field.gridx = 2;
@@ -496,10 +491,9 @@ public class LoginSignup extends JFrame {
 		city_field.setSize(new Dimension(0, 20));
 		city_field.setBorder(new LineBorder(new Color(192, 192, 192)));
 		GridBagConstraints gbc_city_field = new GridBagConstraints();
-		gbc_city_field.gridwidth = 2;
 		gbc_city_field.insets = new Insets(0, 0, 5, 5);
 		gbc_city_field.fill = GridBagConstraints.BOTH;
-		gbc_city_field.gridx = 6;
+		gbc_city_field.gridx = 5;
 		gbc_city_field.gridy = 3;
 		centerPanel.add(city_field, gbc_city_field);
 		city_field.setColumns(10);
@@ -530,13 +524,11 @@ public class LoginSignup extends JFrame {
 		GridBagConstraints gbc_cPass_label = new GridBagConstraints();
 		gbc_cPass_label.anchor = GridBagConstraints.WEST;
 		gbc_cPass_label.insets = new Insets(0, 0, 5, 5);
-		gbc_cPass_label.gridx = 6;
+		gbc_cPass_label.gridx = 5;
 		gbc_cPass_label.gridy = 4;
 		centerPanel.add(cPass_label, gbc_cPass_label);
 		
-		ImageIcon passImageIcon = new ImageIcon(getClass().getResource("/resource/padlock.png"));
-		Image passImage = passImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-		JLabel pass_icon = new JLabel(new ImageIcon(passImage));
+		JLabel pass_icon = new JLabel(new LoadImage("/resource/password-icon.png"));
 		GridBagConstraints gbc_pass_icon = new GridBagConstraints();
 		gbc_pass_icon.anchor = GridBagConstraints.NORTH;
 		gbc_pass_icon.insets = new Insets(0, 0, 5, 5);
@@ -547,20 +539,12 @@ public class LoginSignup extends JFrame {
 		pass_field.setSize(new Dimension(0, 30));
 		pass_field.setBorder(new LineBorder(new Color(192, 192, 192)));
 		GridBagConstraints gbc_pass_field = new GridBagConstraints();
-		gbc_pass_field.gridwidth = 2;
 		gbc_pass_field.fill = GridBagConstraints.BOTH;
 		gbc_pass_field.insets = new Insets(0, 0, 5, 5);
 		gbc_pass_field.gridx = 2;
 		gbc_pass_field.gridy = 5;
 		centerPanel.add(pass_field, gbc_pass_field);
 		pass_field.setColumns(10);
-		
-		UtilDateModel model = new UtilDateModel();
-		Properties p = new Properties();
-		p.put("text.today", "Today");
-		p.put("text.month", "Month");
-		p.put("text.year", "Year");
-		JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
 		
 		cPass_field = new JTextField();
 		cPass_field.addKeyListener(new KeyAdapter() {
@@ -577,10 +561,9 @@ public class LoginSignup extends JFrame {
 		cPass_field.setSize(new Dimension(0, 20));
 		cPass_field.setBorder(new LineBorder(new Color(192, 192, 192)));
 		GridBagConstraints gbc_cPass_field = new GridBagConstraints();
-		gbc_cPass_field.gridwidth = 2;
 		gbc_cPass_field.insets = new Insets(0, 0, 5, 5);
 		gbc_cPass_field.fill = GridBagConstraints.BOTH;
-		gbc_cPass_field.gridx = 6;
+		gbc_cPass_field.gridx = 5;
 		gbc_cPass_field.gridy = 5;
 		centerPanel.add(cPass_field, gbc_cPass_field);
 		cPass_field.setColumns(10);
@@ -599,64 +582,60 @@ public class LoginSignup extends JFrame {
 		GridBagConstraints gbc_gender_label = new GridBagConstraints();
 		gbc_gender_label.anchor = GridBagConstraints.WEST;
 		gbc_gender_label.insets = new Insets(0, 0, 5, 5);
-		gbc_gender_label.gridx = 6;
+		gbc_gender_label.gridx = 5;
 		gbc_gender_label.gridy = 6;
 		centerPanel.add(gender_label, gbc_gender_label);
 		
-		ImageIcon dobImageIcon = new ImageIcon(getClass().getResource("/resource/birthday-cake.png"));
-		Image dobImage = dobImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-		JLabel dob_icon = new JLabel(new ImageIcon(dobImage));
+		JLabel dob_icon = new JLabel(new LoadImage("/resource/dob-icon.png") );
 		GridBagConstraints gbc_dob_icon = new GridBagConstraints();
 		gbc_dob_icon.anchor = GridBagConstraints.NORTH;
 		gbc_dob_icon.insets = new Insets(0, 0, 5, 5);
 		gbc_dob_icon.gridx = 1;
 		gbc_dob_icon.gridy = 7;
 		centerPanel.add(dob_icon, gbc_dob_icon);
-		JDatePickerImpl dob_field = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		dob_field.getJFormattedTextField().setFont(new Font("Tahoma", Font.PLAIN, 9));
+		
+		JDateChooser dob_field = new JDateChooser();
+		dob_field.setDateFormatString("yyyy-MM-dd");
 		GridBagConstraints gbc_dob_field = new GridBagConstraints();
-		gbc_dob_field.gridwidth = 2;
 		gbc_dob_field.insets = new Insets(0, 0, 5, 5);
-		gbc_dob_field.fill = GridBagConstraints.HORIZONTAL;
+		gbc_dob_field.fill = GridBagConstraints.BOTH;
 		gbc_dob_field.gridx = 2;
 		gbc_dob_field.gridy = 7;
 		centerPanel.add(dob_field, gbc_dob_field);
 		
-		ImageIcon maleImageIcon = new ImageIcon(getClass().getResource("/resource/mars.png"));
-		Image maleImage = maleImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-		ImageIcon femaleImageIcon = new ImageIcon(getClass().getResource("/resource/femenine.png"));
-		Image femaleImage = femaleImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-		ImageIcon otherImageIcon = new ImageIcon(getClass().getResource("/resource/third-gender.png"));
-		Image otherImage = otherImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-		JLabel gender_icon = new JLabel(new ImageIcon(maleImage));
+		ImageIcon maleImage = new LoadImage("/resource/male-icon.png");
+		ImageIcon femaleImage = new LoadImage("/resource/female-icon.png");
+		ImageIcon otherImage = new LoadImage("/resource/thirdGender-icon.png");
+
+		JLabel gender_icon = new JLabel();
 		GridBagConstraints gbc_gender_icon = new GridBagConstraints();
 		gbc_gender_icon.anchor = GridBagConstraints.NORTH;
 		gbc_gender_icon.insets = new Insets(0, 0, 5, 5);
-		gbc_gender_icon.gridx = 5;
+		gbc_gender_icon.gridx = 4;
 		gbc_gender_icon.gridy = 7;
 		centerPanel.add(gender_icon, gbc_gender_icon);
+		
 		
 		JComboBox<String> gender_combo = new JComboBox<String>();
 		gender_combo.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if(gender_combo.getSelectedItem() == "Male") {
-					gender_icon.setIcon(new ImageIcon(maleImage));
+					gender_icon.setIcon(maleImage);
 				}
 				if(gender_combo.getSelectedItem() == "Female") {
-					gender_icon.setIcon(new ImageIcon(femaleImage));
+					gender_icon.setIcon(femaleImage);
 				}
 				if(gender_combo.getSelectedItem() == "Other") {
-					gender_icon.setIcon(new ImageIcon(otherImage));
+					gender_icon.setIcon(otherImage);
 				}
 			}
 		});
 		
 		gender_combo.setModel(new DefaultComboBoxModel<String>(new String[] {"Male", "Female", "Other"}));
 		GridBagConstraints gbc_gender_combo = new GridBagConstraints();
-		gbc_gender_combo.gridwidth = 2;
 		gbc_gender_combo.insets = new Insets(0, 0, 5, 5);
 		gbc_gender_combo.fill = GridBagConstraints.BOTH;
-		gbc_gender_combo.gridx = 6;
+		gbc_gender_combo.gridx = 5;
 		gbc_gender_combo.gridy = 7;
 		centerPanel.add(gender_combo, gbc_gender_combo);
 		
@@ -674,92 +653,122 @@ public class LoginSignup extends JFrame {
 		GridBagConstraints gbc_email_label = new GridBagConstraints();
 		gbc_email_label.anchor = GridBagConstraints.WEST;
 		gbc_email_label.insets = new Insets(0, 0, 5, 5);
-		gbc_email_label.gridx = 6;
+		gbc_email_label.gridx = 5;
 		gbc_email_label.gridy = 8;
 		centerPanel.add(email_label, gbc_email_label);
 		
-		ImageIcon courseImageIcon = new ImageIcon(getClass().getResource("/resource/online-course.png"));
-		Image courseImage = courseImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-		JLabel course_icon = new JLabel(new ImageIcon(courseImage));
+		JLabel course_icon = new JLabel(new LoadImage("/resource/course-icon.png"));
 		GridBagConstraints gbc_course_icon = new GridBagConstraints();
 		gbc_course_icon.anchor = GridBagConstraints.NORTH;
-		gbc_course_icon.insets = new Insets(0, 0, 0, 5);
+		gbc_course_icon.insets = new Insets(0, 0, 5, 5);
 		gbc_course_icon.gridx = 1;
 		gbc_course_icon.gridy = 9;
 		centerPanel.add(course_icon, gbc_course_icon);
 		
+		Object courses[] = new Courses().availableCourses().keySet().toArray();
 		JComboBox<Object> course_combo = new JComboBox<Object>();
-		course_combo.setModel(new DefaultComboBoxModel<Object>(new Read().getCourses()));
+		course_combo.setModel(new DefaultComboBoxModel<Object>(courses));
 		GridBagConstraints gbc_course_combo = new GridBagConstraints();
-		gbc_course_combo.gridwidth = 2;
-		gbc_course_combo.insets = new Insets(0, 0, 0, 5);
+		gbc_course_combo.insets = new Insets(0, 0, 5, 5);
 		gbc_course_combo.fill = GridBagConstraints.BOTH;
 		gbc_course_combo.gridx = 2;
 		gbc_course_combo.gridy = 9;
 		centerPanel.add(course_combo, gbc_course_combo);
 		
-		ImageIcon emailImageIcon = new ImageIcon(getClass().getResource("/resource/email.png"));
-		Image emailImage = emailImageIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-		JLabel email_icon = new JLabel(new ImageIcon(emailImage));
+		JLabel email_icon = new JLabel(new LoadImage("/resource/email-icon.png"));
 		GridBagConstraints gbc_email_icon = new GridBagConstraints();
-		gbc_email_icon.insets = new Insets(0, 0, 0, 5);
+		gbc_email_icon.insets = new Insets(0, 0, 5, 5);
 		gbc_email_icon.anchor = GridBagConstraints.NORTHEAST;
-		gbc_email_icon.gridx = 5;
+		gbc_email_icon.gridx = 4;
 		gbc_email_icon.gridy = 9;
 		centerPanel.add(email_icon, gbc_email_icon);
 		
+		JLabel message = new JLabel("");
+		GridBagConstraints gbc_message = new GridBagConstraints();
+		gbc_message.gridwidth = 6;
+		gbc_message.gridx = 1;
+		gbc_message.gridy = 11;
+		centerPanel.add(message, gbc_message);
+		
 		email_field = new JTextField();
+		email_field.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if(validator.checkEmail(email_field.getText())) {
+					message.setText("");
+				} else {
+					message.setText("Invalid Email");
+				}
+			}
+		});
 		GridBagConstraints gbc_email_field = new GridBagConstraints();
-		gbc_email_field.insets = new Insets(0, 0, 0, 5);
-		gbc_email_field.gridwidth = 2;
-		gbc_email_field.fill = GridBagConstraints.HORIZONTAL;
-		gbc_email_field.gridx = 6;
+		gbc_email_field.insets = new Insets(0, 0, 5, 5);
+		gbc_email_field.fill = GridBagConstraints.BOTH;
+		gbc_email_field.gridx = 5;
 		gbc_email_field.gridy = 9;
 		centerPanel.add(email_field, gbc_email_field);
 		email_field.setColumns(10);
 		
-		JButton register_button = new JButton("Register");
 		register_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					DateModel<?> dateModel = dob_field.getModel();
-					String fname = fname_field.getText();
-					String lname = lname_field.getText();
+					StudentDetails studentDetails = new StudentDetails();
+					Students students = new Students();
+					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 					String pass = pass_field.getText();
 					String cPass = cPass_field.getText();
-					String dob = String.valueOf(dateModel.getYear()) + "-" + String.valueOf(dateModel.getMonth()+1) + "-" + String.valueOf(dateModel.getDay());
-					Date date = Date.valueOf(dob);
-					String address = address_field.getText() + ", " + city_field.getText();
-					String gender = (String) gender_combo.getSelectedItem();
-					String course = (String) course_combo.getSelectedItem();
-					String email = email_field.getText();
-					int id = new Read().getID("student") + 1;
 					
-					if (!pass.equals(cPass)) {
-						new ErrorGUI("Password Did Not Matched...");
-						return;
-					} else if (pass.length() < 5) {
-						new ErrorGUI("Password Cannot be less than 5 Character...");
+					studentDetails.setStdId(students.generateStudentID());
+					studentDetails.setFirstName(fname_field.getText());
+					studentDetails.setLastName(lname_field.getText());
+					studentDetails.setDob(Date.valueOf(format.format(dob_field.getDate())));
+					studentDetails.setAddress(address_field.getText() + ", " + city_field.getText());
+					studentDetails.setGender((String) gender_combo.getSelectedItem());
+					studentDetails.setCourseEnrolled((String) course_combo.getSelectedItem());
+					studentDetails.setEmail(email_field.getText());
+					
+					if (!validator.checkPassword(pass, cPass)) {
+						new ErrorGUI("Password Does Not Match");
 						return;
 					}
+					studentDetails.setPassword(pass);
 					
-					new Create().addStudent(String.valueOf(id), fname, lname, date, address, gender, course, email, pass);
-					new PopUpMessage("Successfully Created Account", "Your UserID is: " + id, "Your Password is: " + pass);
+					boolean execute = new Students().createStudent(studentDetails);
 					
-					contentPane.removeAll();
-					loginComponent();
-					contentPane.updateUI();
+					if (execute) {
+						new PopUpMessage("Successfully Created Account", "Your UserID is: " + studentDetails.getStdId(), "Your Password is: " + studentDetails.getPassword());
+						loginComponent();
+					} else {
+						new ErrorGUI("Error While Creating Account");
+					}
+					
 				} catch (Exception e2) {
 					new ErrorGUI("All Fields are Mandatory.");
 					e2.printStackTrace();
 				}
 			}
 		});
-		GridBagConstraints gbc_register_button = new GridBagConstraints();
-		gbc_register_button.anchor = GridBagConstraints.NORTH;
-		gbc_register_button.insets = new Insets(0, 0, 5, 5);
-		gbc_register_button.gridx = 1;
-		gbc_register_button.gridy = 0;
-		bottomPanel.add(register_button, gbc_register_button);
+		
+		if (courses.length == 0) {
+			register_button.setEnabled(false);
+			message.setText("Currently There are No Courses Available");
+		}
+		
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+		  .addKeyEventDispatcher((KeyEventDispatcher) new KeyEventDispatcher() {
+		      @Override
+		      public boolean dispatchKeyEvent(KeyEvent e) {
+		    	  if (fname_field.getText().isEmpty() || lname_label.getText().isEmpty() || 
+		    			  address_field.getText().isEmpty() || city_field.getText().isEmpty() || 
+		    			  pass_field.getText().isEmpty() || cPass_field.getText().isEmpty() || 
+		    			  email_field.getText().isEmpty()) {
+						register_button.setEnabled(false);
+		    	  } else {
+						register_button.setEnabled(true);
+		    	  }
+		    	  
+		    	  return false;
+		      }
+		  });
 	}
 }
